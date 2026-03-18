@@ -1,5 +1,10 @@
 # 2026_FSST_5AHEL_cmitterm_fschoer1_Mastermind
 
+## Ausgaben ##
+ERklärung/Beschreibung wegklappbar
+Fixe andere Symbole mit Buttons zum eingeben und bevor ich sie teste kann ich sie noch mit drag und drop verschieben.
+
+
 ## Promt: ##
 Gut so, bitte arbeite genau die Aufgabenstellung ab und gib mir den gesammten Code. Verwende leichtere Funktionen bzw schreibe das Programm verständlich.
 
