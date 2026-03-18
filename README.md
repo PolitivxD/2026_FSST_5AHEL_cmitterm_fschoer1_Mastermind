@@ -1,9 +1,9 @@
 # 2026_FSST_5AHEL_cmitterm_fschoer1_Mastermind
 
-Promt:
+## Promt: ##
 Gut so, bitte arbeite genau die Aufgabenstellung ab und gib mir den gesammten Code. Verwende leichtere Funktionen bzw schreibe das Programm verständlich.
 
-Ausgabe: Erste Version des Programms
+## Ausgabe: ##
 Ja, Christoph. Hier ist alles **1:1 zum Reinkopieren** für **deine Struktur** mit
 
 * `org.example.mastermind`
@@ -711,3 +711,128 @@ Falls dein `pom.xml` noch auf `HelloApplication` zeigt, ersetze ihn komplett dur
 4. Starten über `MainApp` oder Maven
 
 Wenn beim Einfügen irgendwo rot unterstrichen wird, schick mir einfach den Fehler oder Screenshot.
+
+
+------
+
+## Promt: ##
+Erkläre mir kurz was jede einzelnde Datei Macht
+
+## Antwort: ##
+Ja, Christoph.
+
+## `MainApp.java`
+
+Startet das ganze Programm.
+
+* erstellt **Model**
+* erstellt **View**
+* erstellt **Controller**
+* öffnet das JavaFX-Fenster
+
+Also: **Einstiegspunkt des Programms**
+
+---
+
+## `MastermindController.java`
+
+Steuert den Ablauf des Spiels.
+
+* reagiert auf Button-Klicks
+* holt die Eingabe aus der View
+* lässt das Model prüfen und auswerten
+* sagt der View, was angezeigt werden soll
+* prüft Gewinn oder Spielende
+
+Also: **Verbindung zwischen View und Model**
+
+---
+
+## `MastermindModel.java`
+
+Enthält die komplette Spiellogik.
+
+* erzeugt den geheimen Farbcode
+* prüft, ob eine Eingabe gültig ist
+* wertet einen Versuch aus
+* zählt die benutzten und übrigen Versuche
+* merkt sich, ob gewonnen wurde oder das Spiel vorbei ist
+
+Also: **hier passiert die eigentliche Logik**
+
+---
+
+## `Evaluation.java`
+
+Speichert das Ergebnis eines Versuchs.
+
+* wie viele Farben **richtig und an richtiger Stelle** sind
+* wie viele Farben **richtig, aber an falscher Stelle** sind
+
+Also: **ein kleines Ergebnis-Objekt für die Rückmeldung**
+
+---
+
+## `RoundEntry.java`
+
+Speichert **einen kompletten Versuch**.
+
+* den eingegebenen Code
+* die zugehörige Auswertung
+
+Also: **eine Zeile der Spielhistorie**
+
+---
+
+## `MastermindView.java`
+
+Ist die grafische Oberfläche.
+
+* zeigt das Spielfeld an
+* zeigt frühere Versuche
+* zeigt die Auswertung
+* zeigt verbleibende Versuche
+* enthält Eingabefeld und Buttons
+* gibt Meldungen aus
+
+Also: **alles, was der Spieler sieht und bedient**
+
+---
+
+## `module-info.java`
+
+Legt fest, welche JavaFX-Module verwendet werden.
+
+Bei dir:
+
+* `javafx.controls`
+
+Also: **Modulbeschreibung des Projekts**
+
+---
+
+## `pom.xml`
+
+Ist die Maven-Projektdatei.
+
+* verwaltet Bibliotheken
+* bindet JavaFX ein
+* legt Java-Version fest
+* sagt Maven, welche Hauptklasse gestartet werden soll
+
+Also: **Projekt- und Build-Konfiguration**
+
+---
+
+## Ganz kurz zusammengefasst
+
+* **MainApp** → startet alles
+* **Controller** → steuert das Spiel
+* **Model** → enthält die Logik
+* **Evaluation** → Ergebnis eines Tipps
+* **RoundEntry** → ein Versuch mit Auswertung
+* **View** → Oberfläche
+* **module-info** → Java-Module
+* **pom.xml** → Maven-Einstellungen
+
+Wenn du willst, erkläre ich dir als Nächstes noch **den Ablauf vom Programm Schritt für Schritt**, also was beim Starten und bei einem Klick genau passiert.
