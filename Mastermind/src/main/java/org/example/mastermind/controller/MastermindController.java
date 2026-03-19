@@ -47,6 +47,7 @@ public class MastermindController {
         for (int i = 0; i < MastermindModel.CODE_LENGTH; i++) {
             currentGuess.add(null);
         }
+
     }
 
     private void handleShapeSelected(ShapeType shapeType) {
@@ -58,12 +59,13 @@ public class MastermindController {
             }
         }
 
-        view.showError("Es sind bereits 4 Formen ausgewählt. Prüfe die Eingabe oder leere sie zuerst.");
+        view.showError("Es sind bereits 4 Formen ausgewählt. Prüfen sie die Eingabe oder leere sie zuerst.");
     }
 
     private void handleShapeDroppedToGuess(ShapeType shapeType, int targetIndex) {
         if (targetIndex < 0 || targetIndex >= currentGuess.size()) {
             return;
+
         }
 
         currentGuess.set(targetIndex, shapeType);

@@ -12,6 +12,7 @@ public class RoundEntry {
     public RoundEntry(List<ShapeType> guess, Evaluation evaluation) {
         this.guess = new ArrayList<>(guess);
         this.evaluation = evaluation;
+
     }
 
     public List<ShapeType> getGuess() {

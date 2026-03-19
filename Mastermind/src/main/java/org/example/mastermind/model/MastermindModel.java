@@ -105,6 +105,7 @@ public class MastermindModel {
         for (int i = 0; i < CODE_LENGTH; i++) {
             if (guessUsed[i]) {
                 continue;
+
             }
 
             for (int j = 0; j < CODE_LENGTH; j++) {
