@@ -1,7 +1,7 @@
 # 2026_FSST_5AHEL_cmitterm_fschoer1_Mastermind
 
-## Ausgaben ##
-ERklärung/Beschreibung wegklappbar
+## Aufgabe ##
+Erklärung/Beschreibung wegklappbar
 Fixe andere Symbole mit Buttons zum eingeben und bevor ich sie teste kann ich sie noch mit drag und drop verschieben.
 
 
