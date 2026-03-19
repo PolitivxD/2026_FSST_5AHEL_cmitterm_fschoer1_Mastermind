@@ -15,7 +15,7 @@ public class MainApp extends Application {
         MastermindView view = new MastermindView();
         new MastermindController(model, view);
 
-        Scene scene = new Scene(view, 450, 850);
+        Scene scene = new Scene(view, 700, 780);
 
         stage.setTitle("Mastermind");
         stage.setScene(scene);

@@ -10,12 +10,12 @@ public class MastermindModel {
     public static final int CODE_LENGTH = 4;
     public static final int MAX_ATTEMPTS = 10;
 
-    private static final char[] ALLOWED_COLORS = {'R', 'G', 'B', 'Y', 'O', 'P'};
+    private static final ShapeType[] ALLOWED_SHAPES = ShapeType.values();
 
     private final Random random = new Random();
     private final List<RoundEntry> history = new ArrayList<>();
 
-    private String secretCode;
+    private List<ShapeType> secretCode;
     private int attemptsUsed;
     private boolean gameOver;
     private boolean won;
@@ -32,34 +32,28 @@ public class MastermindModel {
         history.clear();
     }
 
-    private String generateSecretCode() {
-        StringBuilder code = new StringBuilder();
+    private List<ShapeType> generateSecretCode() {
+        List<ShapeType> code = new ArrayList<>();
 
         for (int i = 0; i < CODE_LENGTH; i++) {
-            int randomIndex = random.nextInt(ALLOWED_COLORS.length);
-            code.append(ALLOWED_COLORS[randomIndex]);
+            int randomIndex = random.nextInt(ALLOWED_SHAPES.length);
+            code.add(ALLOWED_SHAPES[randomIndex]);
         }
 
-        return code.toString();
+        return code;
     }
 
-    public String normalizeGuess(String input) {
-        if (input == null) {
-            return "";
-        }
-
-        return input.toUpperCase().replaceAll("\\s+", "");
-    }
-
-    public boolean isValidGuess(String input) {
-        String guess = normalizeGuess(input);
-
-        if (guess.length() != CODE_LENGTH) {
+    public boolean isValidGuess(List<ShapeType> guess) {
+        if (guess == null) {
             return false;
         }
 
-        for (int i = 0; i < guess.length(); i++) {
-            if (!isAllowedColor(guess.charAt(i))) {
+        if (guess.size() != CODE_LENGTH) {
+            return false;
+        }
+
+        for (ShapeType shape : guess) {
+            if (shape == null) {
                 return false;
             }
         }
@@ -67,28 +61,19 @@ public class MastermindModel {
         return true;
     }
 
-    private boolean isAllowedColor(char c) {
-        for (char allowedColor : ALLOWED_COLORS) {
-            if (allowedColor == c) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public RoundEntry makeGuess(String input) {
+    public RoundEntry makeGuess(List<ShapeType> guess) {
         if (gameOver) {
             throw new IllegalStateException("Das Spiel ist bereits beendet.");
         }
 
-        if (!isValidGuess(input)) {
+        if (!isValidGuess(guess)) {
             throw new IllegalArgumentException("Ungültige Eingabe.");
         }
 
-        String guess = normalizeGuess(input);
-        Evaluation evaluation = evaluateGuess(guess);
+        List<ShapeType> guessCopy = new ArrayList<>(guess);
+        Evaluation evaluation = evaluateGuess(guessCopy);
 
-        RoundEntry entry = new RoundEntry(guess, evaluation);
+        RoundEntry entry = new RoundEntry(guessCopy, evaluation);
         history.add(entry);
         attemptsUsed++;
 
@@ -102,15 +87,15 @@ public class MastermindModel {
         return entry;
     }
 
-    private Evaluation evaluateGuess(String guess) {
+    private Evaluation evaluateGuess(List<ShapeType> guess) {
         boolean[] secretUsed = new boolean[CODE_LENGTH];
         boolean[] guessUsed = new boolean[CODE_LENGTH];
 
         int exactMatches = 0;
-        int colorOnlyMatches = 0;
+        int shapeOnlyMatches = 0;
 
         for (int i = 0; i < CODE_LENGTH; i++) {
-            if (guess.charAt(i) == secretCode.charAt(i)) {
+            if (guess.get(i) == secretCode.get(i)) {
                 exactMatches++;
                 secretUsed[i] = true;
                 guessUsed[i] = true;
@@ -127,8 +112,8 @@ public class MastermindModel {
                     continue;
                 }
 
-                if (guess.charAt(i) == secretCode.charAt(j)) {
-                    colorOnlyMatches++;
+                if (guess.get(i) == secretCode.get(j)) {
+                    shapeOnlyMatches++;
                     secretUsed[j] = true;
                     guessUsed[i] = true;
                     break;
@@ -136,7 +121,7 @@ public class MastermindModel {
             }
         }
 
-        return new Evaluation(exactMatches, colorOnlyMatches);
+        return new Evaluation(exactMatches, shapeOnlyMatches);
     }
 
     public List<RoundEntry> getHistory() {
@@ -147,8 +132,8 @@ public class MastermindModel {
         return MAX_ATTEMPTS - attemptsUsed;
     }
 
-    public String getSecretCode() {
-        return secretCode;
+    public List<ShapeType> getSecretCode() {
+        return Collections.unmodifiableList(secretCode);
     }
 
     public boolean isGameOver() {

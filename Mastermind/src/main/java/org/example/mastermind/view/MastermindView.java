@@ -5,35 +5,68 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.example.mastermind.model.Evaluation;
 import org.example.mastermind.model.RoundEntry;
+import org.example.mastermind.model.ShapeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MastermindView extends BorderPane {
+
+    @FunctionalInterface
+    public interface GuessReorderHandler {
+        void handle(int fromIndex, int toIndex);
+    }
+
+    @FunctionalInterface
+    public interface ShapeDropToGuessHandler {
+        void handle(ShapeType shapeType, int targetIndex);
+    }
 
     private final Label remainingAttemptsLabel = new Label();
     private final Label messageLabel = new Label();
 
-    private final TextField guessField = new TextField();
+    private final Button descriptionButton = new Button("Erklärung / Beschreibung");
     private final Button submitButton = new Button("Versuch prüfen");
     private final Button restartButton = new Button("Neues Spiel");
+    private final Button clearCurrentGuessButton = new Button("Eingabe leeren");
+    private final Button removeLastButton = new Button("Letzte Form löschen");
 
     private final GridPane boardGrid = new GridPane();
 
     private final List<HBox> guessRows = new ArrayList<>();
     private final List<HBox> feedbackRows = new ArrayList<>();
+
+    private final List<Button> shapeButtons = new ArrayList<>();
+    private final List<StackPane> currentGuessSlots = new ArrayList<>();
+    private List<ShapeType> currentGuessState = new ArrayList<>();
+
+    private Consumer<ShapeType> shapeSelectedHandler;
+    private GuessReorderHandler guessReorderHandler;
+    private ShapeDropToGuessHandler shapeDropToGuessHandler;
 
     public MastermindView() {
         createLayout();
@@ -46,28 +79,207 @@ public class MastermindView extends BorderPane {
         Label titleLabel = new Label("Mastermind");
         titleLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
 
-        Label colorsLabel = new Label("Farben: R = Rot, G = Grün, B = Blau, Y = Gelb, O = Orange, P = Pink");
-        Label inputInfoLabel = new Label("Eingabe: RGBY oder R G B Y");
+        HBox titleBox = new HBox(12, titleLabel, descriptionButton);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
 
         messageLabel.setWrapText(true);
-        messageLabel.setMinHeight(30);
+        messageLabel.setMinHeight(28);
 
-        VBox topBox = new VBox(8, titleLabel, remainingAttemptsLabel, colorsLabel, inputInfoLabel, messageLabel);
+        VBox topBox = new VBox(10, titleBox, remainingAttemptsLabel, messageLabel);
         topBox.setPadding(new Insets(0, 0, 20, 0));
 
         createBoard();
 
-        Label inputLabel = new Label("Code:");
-        guessField.setPromptText("z. B. R G B Y");
-        guessField.setPrefWidth(180);
-
-        HBox bottomBox = new HBox(10, inputLabel, guessField, submitButton, restartButton);
-        bottomBox.setAlignment(Pos.CENTER_LEFT);
+        VBox bottomBox = new VBox(
+                16,
+                createShapeSelectionBox(),
+                createCurrentGuessBox(),
+                createButtonBox()
+        );
         bottomBox.setPadding(new Insets(20, 0, 0, 0));
 
         setTop(topBox);
         setCenter(boardGrid);
         setBottom(bottomBox);
+    }
+
+    public void showDescriptionDialog() {
+        Stage dialog = new Stage();
+
+        if (getScene() != null && getScene().getWindow() != null) {
+            dialog.initOwner(getScene().getWindow());
+        }
+
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Spielbeschreibung");
+
+        Label line1 = new Label("• Der Computer erzeugt einen geheimen Code aus 4 Formen.");
+        Label line2 = new Label("• Verfügbare Formen: Kreis, Rechteck, Dreieck, Raute, Stern, Sechseck.");
+        Label line3 = new Label("• Formen dürfen sich wiederholen.");
+        Label line4 = new Label("• Du hast 10 Versuche.");
+        Label line5 = new Label("• Schwarzer Punkt: richtige Form an richtiger Position.");
+        Label line6 = new Label("• Weißer Punkt: richtige Form, aber falsche Position.");
+        Label line7 = new Label("• Formen können angeklickt oder per Drag & Drop in den Prüfbereich gezogen werden.");
+        Label line8 = new Label("• Im Prüfbereich können Formen vor dem Prüfen noch per Drag & Drop umgeordnet werden.");
+
+        Button okButton = new Button("OK");
+        okButton.setDefaultButton(true);
+        okButton.setOnAction(event -> dialog.close());
+
+        VBox root = new VBox(10, line1, line2, line3, line4, line5, line6, line7, line8, okButton);
+        root.setPadding(new Insets(18));
+        root.setAlignment(Pos.TOP_LEFT);
+
+        Scene scene = new Scene(root, 620, 290);
+        dialog.setScene(scene);
+        dialog.setResizable(false);
+        dialog.showAndWait();
+    }
+
+    private VBox createShapeSelectionBox() {
+        Label selectionLabel = new Label("Form auswählen:");
+        selectionLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+
+        FlowPane buttonPane = new FlowPane();
+        buttonPane.setHgap(10);
+        buttonPane.setVgap(10);
+
+        for (ShapeType shapeType : ShapeType.values()) {
+            Button button = createShapeButton(shapeType);
+            shapeButtons.add(button);
+            buttonPane.getChildren().add(button);
+        }
+
+        Label hint = new Label("Klick = nächste freie Stelle füllen | Ziehen = direkt in einen Zielplatz ziehen");
+
+        return new VBox(8, selectionLabel, buttonPane, hint);
+    }
+
+    private Button createShapeButton(ShapeType shapeType) {
+        Button button = new Button();
+        button.setPrefSize(90, 70);
+        button.setGraphic(createShapeGraphic(shapeType, 34));
+        button.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #bdbdbd;");
+
+        button.setOnAction(event -> {
+            if (shapeSelectedHandler != null) {
+                shapeSelectedHandler.accept(shapeType);
+            }
+        });
+
+        button.setOnDragDetected(event -> {
+            Dragboard dragboard = button.startDragAndDrop(TransferMode.COPY);
+            ClipboardContent content = new ClipboardContent();
+            content.putString("PALETTE:" + shapeType.name());
+            dragboard.setContent(content);
+
+            WritableImage image = button.snapshot(new SnapshotParameters(), null);
+            dragboard.setDragView(image, image.getWidth() / 2, image.getHeight() / 2);
+
+            event.consume();
+        });
+
+        return button;
+    }
+
+    private VBox createCurrentGuessBox() {
+        Label guessLabel = new Label("Prüfbereich:");
+        guessLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+
+        HBox slotBox = new HBox(12);
+        slotBox.setAlignment(Pos.CENTER_LEFT);
+
+        for (int i = 0; i < 4; i++) {
+            StackPane slot = createCurrentGuessSlot(i);
+            currentGuessSlots.add(slot);
+            slotBox.getChildren().add(slot);
+        }
+
+        Label hintLabel = new Label("Du kannst Formen direkt aus der Auswahl hier hineinziehen oder vorhandene Formen umordnen.");
+
+        return new VBox(8, guessLabel, slotBox, hintLabel);
+    }
+
+    private StackPane createCurrentGuessSlot(int slotIndex) {
+        StackPane slot = new StackPane();
+        slot.setPrefSize(80, 80);
+        slot.setMinSize(80, 80);
+        slot.setMaxSize(80, 80);
+        slot.setStyle("-fx-border-color: #616161; -fx-border-width: 2; -fx-background-color: #fafafa;");
+
+        slot.setOnDragDetected(event -> {
+            if (slotIndex >= currentGuessState.size()) {
+                return;
+            }
+
+            if (currentGuessState.get(slotIndex) == null) {
+                return;
+            }
+
+            Dragboard dragboard = slot.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString("SLOT:" + slotIndex);
+            dragboard.setContent(content);
+
+            WritableImage image = slot.snapshot(new SnapshotParameters(), null);
+            dragboard.setDragView(image, image.getWidth() / 2, image.getHeight() / 2);
+
+            slot.setOpacity(0.35);
+            event.consume();
+        });
+
+        slot.setOnDragDone(event -> slot.setOpacity(1.0));
+
+        slot.setOnDragOver(event -> {
+            Dragboard dragboard = event.getDragboard();
+
+            if (dragboard.hasString()) {
+                String value = dragboard.getString();
+
+                if (value.startsWith("PALETTE:") || value.startsWith("SLOT:")) {
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+            }
+
+            event.consume();
+        });
+
+        slot.setOnDragDropped(event -> {
+            boolean success = false;
+            Dragboard dragboard = event.getDragboard();
+
+            if (dragboard.hasString()) {
+                String value = dragboard.getString();
+
+                if (value.startsWith("PALETTE:")) {
+                    String shapeName = value.substring("PALETTE:".length());
+                    ShapeType shapeType = ShapeType.valueOf(shapeName);
+
+                    if (shapeDropToGuessHandler != null) {
+                        shapeDropToGuessHandler.handle(shapeType, slotIndex);
+                        success = true;
+                    }
+                } else if (value.startsWith("SLOT:")) {
+                    int fromIndex = Integer.parseInt(value.substring("SLOT:".length()));
+
+                    if (guessReorderHandler != null) {
+                        guessReorderHandler.handle(fromIndex, slotIndex);
+                        success = true;
+                    }
+                }
+            }
+
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
+        return slot;
+    }
+
+    private HBox createButtonBox() {
+        HBox buttonBox = new HBox(10, submitButton, clearCurrentGuessButton, removeLastButton, restartButton);
+        buttonBox.setAlignment(Pos.CENTER_LEFT);
+        return buttonBox;
     }
 
     private void createBoard() {
@@ -111,8 +323,15 @@ public class MastermindView extends BorderPane {
         box.getChildren().clear();
 
         for (int i = 0; i < 4; i++) {
-            box.getChildren().add(createGuessCircle(' ', Color.LIGHTGRAY));
+            box.getChildren().add(createBoardGuessPlaceholder());
         }
+    }
+
+    private Node createBoardGuessPlaceholder() {
+        StackPane placeholder = new StackPane();
+        placeholder.setPrefSize(54, 54);
+        placeholder.setStyle("-fx-border-color: transparent; -fx-background-color: transparent;");
+        return placeholder;
     }
 
     private void fillFeedbackRowWithPlaceholders(HBox box) {
@@ -123,15 +342,151 @@ public class MastermindView extends BorderPane {
         }
     }
 
-    private Node createGuessCircle(char letter, Color color) {
-        Circle circle = new Circle(17);
-        circle.setFill(color);
-        circle.setStroke(Color.BLACK);
+    public void renderCurrentGuess(List<ShapeType> guess) {
+        currentGuessState = new ArrayList<>(guess);
 
-        Label label = new Label(letter == ' ' ? "" : String.valueOf(letter));
-        label.setStyle("-fx-font-weight: bold; -fx-text-fill: black;");
+        for (int i = 0; i < currentGuessSlots.size(); i++) {
+            StackPane slot = currentGuessSlots.get(i);
+            slot.getChildren().clear();
+            slot.setOpacity(1.0);
 
-        return new StackPane(circle, label);
+            ShapeType shapeType = guess.get(i);
+
+            if (shapeType == null) {
+                Label placeholder = new Label(String.valueOf(i + 1));
+                placeholder.setStyle("-fx-text-fill: #9e9e9e; -fx-font-size: 18px; -fx-font-weight: bold;");
+                slot.getChildren().add(placeholder);
+            } else {
+                slot.getChildren().add(createShapeGraphic(shapeType, 42));
+            }
+        }
+    }
+
+    public void updateBoard(List<RoundEntry> history) {
+        for (int row = 0; row < 10; row++) {
+            if (row < history.size()) {
+                RoundEntry entry = history.get(row);
+                updateGuessRow(row, entry.getGuess());
+                updateFeedbackRow(row, entry.getEvaluation());
+            } else {
+                fillGuessRowWithPlaceholders(guessRows.get(row));
+                fillFeedbackRowWithPlaceholders(feedbackRows.get(row));
+            }
+        }
+    }
+
+    private void updateGuessRow(int rowIndex, List<ShapeType> guess) {
+        HBox row = guessRows.get(rowIndex);
+        row.getChildren().clear();
+
+        for (ShapeType shapeType : guess) {
+            StackPane cell = new StackPane();
+            cell.setPrefSize(54, 54);
+            cell.setStyle("-fx-border-color: transparent; -fx-background-color: transparent;");
+            cell.getChildren().add(createShapeGraphic(shapeType, 28));
+            row.getChildren().add(cell);
+        }
+    }
+
+    private void updateFeedbackRow(int rowIndex, Evaluation evaluation) {
+        HBox row = feedbackRows.get(rowIndex);
+        row.getChildren().clear();
+
+        int exact = evaluation.getExactMatches();
+        int shapeOnly = evaluation.getShapeOnlyMatches();
+        int empty = 4 - exact - shapeOnly;
+
+        for (int i = 0; i < exact; i++) {
+            row.getChildren().add(createBlackFeedbackPeg());
+        }
+
+        for (int i = 0; i < shapeOnly; i++) {
+            row.getChildren().add(createWhiteFeedbackPeg());
+        }
+
+        for (int i = 0; i < empty; i++) {
+            row.getChildren().add(createEmptyFeedbackPeg());
+        }
+    }
+
+    private Node createShapeGraphic(ShapeType shapeType, double size) {
+        Shape shape = switch (shapeType) {
+            case CIRCLE -> createCircleShape(size);
+            case RECTANGLE -> createRectangleShape(size);
+            case TRIANGLE -> createTriangleShape(size);
+            case DIAMOND -> createDiamondShape(size);
+            case STAR -> createStarShape(size);
+            case HEXAGON -> createHexagonShape(size);
+        };
+
+        shape.setFill(Color.web("#7ec8e3"));
+        shape.setStroke(Color.BLACK);
+        shape.setStrokeWidth(2);
+
+        StackPane pane = new StackPane(shape);
+        pane.setPrefSize(size + 14, size + 14);
+        return pane;
+    }
+
+    private Shape createCircleShape(double size) {
+        return new Circle(size * 0.32);
+    }
+
+    private Shape createRectangleShape(double size) {
+        Rectangle rectangle = new Rectangle(size * 0.72, size * 0.48);
+        rectangle.setArcWidth(8);
+        rectangle.setArcHeight(8);
+        return rectangle;
+    }
+
+    private Shape createTriangleShape(double size) {
+        Polygon triangle = new Polygon();
+        triangle.getPoints().addAll(
+                0.0, -size * 0.38,
+                -size * 0.36, size * 0.28,
+                size * 0.36, size * 0.28
+        );
+        return triangle;
+    }
+
+    private Shape createDiamondShape(double size) {
+        Polygon diamond = new Polygon();
+        diamond.getPoints().addAll(
+                0.0, -size * 0.38,
+                size * 0.30, 0.0,
+                0.0, size * 0.38,
+                -size * 0.30, 0.0
+        );
+        return diamond;
+    }
+
+    private Shape createHexagonShape(double size) {
+        Polygon hexagon = new Polygon();
+        double radius = size * 0.34;
+
+        for (int i = 0; i < 6; i++) {
+            double angle = Math.toRadians(60 * i - 30);
+            hexagon.getPoints().add(radius * Math.cos(angle));
+            hexagon.getPoints().add(radius * Math.sin(angle));
+        }
+
+        return hexagon;
+    }
+
+    private Shape createStarShape(double size) {
+        Polygon star = new Polygon();
+
+        double outerRadius = size * 0.34;
+        double innerRadius = size * 0.15;
+
+        for (int i = 0; i < 10; i++) {
+            double radius = (i % 2 == 0) ? outerRadius : innerRadius;
+            double angle = Math.toRadians(-90 + i * 36);
+            star.getPoints().add(radius * Math.cos(angle));
+            star.getPoints().add(radius * Math.sin(angle));
+        }
+
+        return star;
     }
 
     private Node createBlackFeedbackPeg() {
@@ -155,62 +510,6 @@ public class MastermindView extends BorderPane {
         return circle;
     }
 
-    private Color getColorForCode(char code) {
-        return switch (code) {
-            case 'R' -> Color.RED;
-            case 'G' -> Color.LIMEGREEN;
-            case 'B' -> Color.DODGERBLUE;
-            case 'Y' -> Color.GOLD;
-            case 'O' -> Color.ORANGE;
-            case 'P' -> Color.HOTPINK;
-            default -> Color.LIGHTGRAY;
-        };
-    }
-
-    public void updateBoard(List<RoundEntry> history) {
-        for (int row = 0; row < 10; row++) {
-            if (row < history.size()) {
-                RoundEntry entry = history.get(row);
-                updateGuessRow(row, entry.getGuess());
-                updateFeedbackRow(row, entry.getEvaluation());
-            } else {
-                fillGuessRowWithPlaceholders(guessRows.get(row));
-                fillFeedbackRowWithPlaceholders(feedbackRows.get(row));
-            }
-        }
-    }
-
-    private void updateGuessRow(int rowIndex, String guess) {
-        HBox row = guessRows.get(rowIndex);
-        row.getChildren().clear();
-
-        for (int i = 0; i < guess.length(); i++) {
-            char code = guess.charAt(i);
-            row.getChildren().add(createGuessCircle(code, getColorForCode(code)));
-        }
-    }
-
-    private void updateFeedbackRow(int rowIndex, Evaluation evaluation) {
-        HBox row = feedbackRows.get(rowIndex);
-        row.getChildren().clear();
-
-        int exact = evaluation.getExactMatches();
-        int colorOnly = evaluation.getColorOnlyMatches();
-        int empty = 4 - exact - colorOnly;
-
-        for (int i = 0; i < exact; i++) {
-            row.getChildren().add(createBlackFeedbackPeg());
-        }
-
-        for (int i = 0; i < colorOnly; i++) {
-            row.getChildren().add(createWhiteFeedbackPeg());
-        }
-
-        for (int i = 0; i < empty; i++) {
-            row.getChildren().add(createEmptyFeedbackPeg());
-        }
-    }
-
     public void resetBoard() {
         for (int i = 0; i < 10; i++) {
             fillGuessRowWithPlaceholders(guessRows.get(i));
@@ -220,6 +519,7 @@ public class MastermindView extends BorderPane {
 
     public void updateRemainingAttempts(int remainingAttempts) {
         remainingAttemptsLabel.setText("Verbleibende Versuche: " + remainingAttempts);
+        remainingAttemptsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
     }
 
     public void showInfo(String message) {
@@ -242,29 +542,45 @@ public class MastermindView extends BorderPane {
         messageLabel.setText(message);
     }
 
-    public String getGuessInput() {
-        return guessField.getText();
-    }
-
-    public void clearGuessInput() {
-        guessField.clear();
-    }
-
     public void enableInput(boolean enabled) {
-        guessField.setDisable(!enabled);
         submitButton.setDisable(!enabled);
+        clearCurrentGuessButton.setDisable(!enabled);
+        removeLastButton.setDisable(!enabled);
 
-        if (enabled) {
-            guessField.requestFocus();
+        for (Button button : shapeButtons) {
+            button.setDisable(!enabled);
         }
+    }
+
+    public void setOnShapeSelected(Consumer<ShapeType> handler) {
+        this.shapeSelectedHandler = handler;
+    }
+
+    public void setOnShapeDroppedToGuess(ShapeDropToGuessHandler handler) {
+        this.shapeDropToGuessHandler = handler;
+    }
+
+    public void setOnGuessReordered(GuessReorderHandler handler) {
+        this.guessReorderHandler = handler;
     }
 
     public void setOnSubmit(EventHandler<ActionEvent> handler) {
         submitButton.setOnAction(handler);
-        guessField.setOnAction(handler);
     }
 
     public void setOnRestart(EventHandler<ActionEvent> handler) {
         restartButton.setOnAction(handler);
+    }
+
+    public void setOnClearCurrentGuess(EventHandler<ActionEvent> handler) {
+        clearCurrentGuessButton.setOnAction(handler);
+    }
+
+    public void setOnRemoveLast(EventHandler<ActionEvent> handler) {
+        removeLastButton.setOnAction(handler);
+    }
+
+    public void setOnShowDescription(EventHandler<ActionEvent> handler) {
+        descriptionButton.setOnAction(handler);
     }
 }
