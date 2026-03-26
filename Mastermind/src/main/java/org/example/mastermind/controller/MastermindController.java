@@ -141,7 +141,7 @@ public class MastermindController {
         if (model.isGameOver()) {
             view.showLoseMessage("Keine Versuche mehr. Geheimer Code: " + formatSecretCode(model.getSecretCode()));
             view.enableInput(false);
-            Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
+            //Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
             return;
         }
 
