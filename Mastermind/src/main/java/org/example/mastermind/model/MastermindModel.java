@@ -80,8 +80,10 @@ public class MastermindModel {
         if (evaluation.getExactMatches() == CODE_LENGTH) {
             won = true;
             gameOver = true;
+
         } else if (attemptsUsed >= MAX_ATTEMPTS) {
             gameOver = true;
+
         }
 
         return entry;
@@ -143,5 +145,8 @@ public class MastermindModel {
 
     public boolean isWon() {
         return won;
+    }
+    public int getAttemptsUsed() {
+        return attemptsUsed;
     }
 }

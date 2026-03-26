@@ -1,5 +1,6 @@
 package org.example.mastermind.controller;
 
+import org.example.mastermind.model.Leaderboard;
 import org.example.mastermind.model.MastermindModel;
 import org.example.mastermind.model.ShapeType;
 import org.example.mastermind.view.MastermindView;
@@ -133,12 +134,14 @@ public class MastermindController {
         if (model.isWon()) {
             view.showWinMessage("Gewonnen! Du hast den geheimen Code richtig erraten.");
             view.enableInput(false);
+            Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
             return;
         }
 
         if (model.isGameOver()) {
             view.showLoseMessage("Keine Versuche mehr. Geheimer Code: " + formatSecretCode(model.getSecretCode()));
             view.enableInput(false);
+            Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
             return;
         }
 
