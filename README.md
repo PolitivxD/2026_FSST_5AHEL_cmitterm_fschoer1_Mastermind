@@ -6,3 +6,10 @@ Fixe andere Symbole mit Buttons zum eingeben und bevor ich sie teste kann ich si
 Drag und Drop soll nicht nucr in der AUsgabe hin und her schiebbar sein sondern auch von der auswahl heraus in den prüfbereich. Bei der Drag und Drop soll das Element sichbar verschoben werden. (Also das das Element meiner Maus nachfahrt)
 Die grauen spielfelderumrandungen sollen weg sein.
 
+# Programmieren ohne KI ##
+
+## Mittermair ##
+Scoreboard hinzufügen. (Gelöst mit Datei, Table, ArrayList)
+
+
+## Schörkhuber ##
