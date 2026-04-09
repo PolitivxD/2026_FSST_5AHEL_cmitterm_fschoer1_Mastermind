@@ -4,7 +4,7 @@ So passt. Es hat jetzt eine erweiterung von Professor gegeben:
 -Die Buchstaben sollen durch Formen ersetzt werden (Rechteck, Dreieck, ...). Mann kann diese jetzt nicht mehr eingeben sondern einzeln auswählen und diese dann bevor man die eingabe prüft noch mit drag und drop verschieben.
 
 # Ausgabe: #
-Ja, Christoph — hier ist die **komplette neue Version** mit:
+Ja,   — hier ist die **komplette neue Version** mit:
 
 * **TitledPane** für die wegklappbare Spielbeschreibung
 * **Formen statt Buchstaben**
