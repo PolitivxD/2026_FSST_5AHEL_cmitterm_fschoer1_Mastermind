@@ -23,10 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.mastermind.model.Evaluation;
@@ -38,6 +35,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class MastermindView extends BorderPane {
+
+    public void showDifficultySelectionDialog() {
+    }
 
     @FunctionalInterface
     public interface GuessReorderHandler {
@@ -58,9 +58,18 @@ public class MastermindView extends BorderPane {
     private final Button clearCurrentGuessButton = new Button("Eingabe leeren");
     private final Button removeLastButton = new Button("Letzte Form löschen");
 
+    private final Button easyButton = new Button("EASY");
+    private final Button middleButton = new Button("MIDDLE");
+    private final Button hardButton = new Button("HARD");
+
+    private final HBox schwierigkeitsbox = new HBox(10);
+    private final Label schwierigkeitslabel = new Label("Schwierigkeitsgrad:");
+
     private final GridPane boardGrid = new GridPane();
 
     private final TableView<ScoreEntry> scoreboardTable = new TableView<>();
+
+
 
     private final List<HBox> guessRows = new ArrayList<>();
     private final List<HBox> feedbackRows = new ArrayList<>();
@@ -97,6 +106,7 @@ public class MastermindView extends BorderPane {
 
         VBox bottomBox = new VBox(
                 16,
+                setSchwierigkeitsbox(actionEvent -> setOnMouseClicked(event -> showDifficultySelectionDialog())),
                 createShapeSelectionBox(),
                 createCurrentGuessBox(),
                 createButtonBox()
@@ -455,6 +465,8 @@ public class MastermindView extends BorderPane {
             case DIAMOND -> createDiamondShape(size);
             case STAR -> createStarShape(size);
             case HEXAGON -> createHexagonShape(size);
+            case ELLIPSE -> createEllipseShape(size);
+            case LINE -> createLineShape(size);
         };
 
         shape.setFill(Color.web("#7ec8e3"));
@@ -475,6 +487,22 @@ public class MastermindView extends BorderPane {
         rectangle.setArcWidth(8);
         rectangle.setArcHeight(8);
         return rectangle;
+    }
+
+    private Shape createLineShape(double size) {
+
+      Line line = new Line(size * -0.36, size * 0.36, size * 0.36, size * -0.36);
+      line.setStrokeWidth(4);
+
+        return line;
+    }
+
+    private Shape createEllipseShape(double size) {
+
+        Ellipse ellipse = new Ellipse(size * 0.52, size * 0.38);
+        ellipse.setFill(Color.BLUE);
+
+        return ellipse;
     }
 
     private Shape createTriangleShape(double size) {
@@ -588,6 +616,31 @@ public class MastermindView extends BorderPane {
         for (Button button : shapeButtons) {
             button.setDisable(!enabled);
         }
+    }
+
+    public HBox setSchwierigkeitsbox(EventHandler<ActionEvent> handler) {
+        easyButton.setOnAction(handler);
+        middleButton.setOnAction(handler);
+        hardButton.setOnAction(handler);
+
+        schwierigkeitsbox.getChildren().addAll(schwierigkeitslabel, easyButton, middleButton, hardButton);
+        schwierigkeitsbox.setAlignment(Pos.CENTER_LEFT);
+        schwierigkeitsbox.setPadding(new Insets(0, 0, 12, 0));
+
+
+        return schwierigkeitsbox;
+    }
+
+    public int setSchwierigkeitsbox2() {
+        int i=4;
+        if(easyButton.isPressed()){
+            i=4;
+        }else if(middleButton.isPressed()){
+            i=5;
+        }else if(hardButton.isPressed()){
+            i=6;
+        }
+        return i;
     }
 
     public void setOnShapeSelected(Consumer<ShapeType> handler) {

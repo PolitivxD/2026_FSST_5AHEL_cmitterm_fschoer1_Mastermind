@@ -6,7 +6,9 @@ public enum ShapeType {
     TRIANGLE("Dreieck"),
     DIAMOND("Raute"),
     STAR("Stern"),
-    HEXAGON("Sechseck ");
+    HEXAGON("Sechseck"),
+    LINE("Linie"),
+    ELLIPSE("Ellipse");
 
     private final String displayName;
 

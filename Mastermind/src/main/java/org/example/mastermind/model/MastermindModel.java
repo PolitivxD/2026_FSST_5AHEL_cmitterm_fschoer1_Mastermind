@@ -1,5 +1,7 @@
 package org.example.mastermind.model;
 
+import org.example.mastermind.view.MastermindView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +9,9 @@ import java.util.Random;
 
 public class MastermindModel {
 
-    public static final int CODE_LENGTH = 4;
+    MastermindView view;
+
+    public static int CODE_LENGTH = 4;
     public static final int MAX_ATTEMPTS = 10;
 
     private static final ShapeType[] ALLOWED_SHAPES = ShapeType.values();
@@ -41,6 +45,10 @@ public class MastermindModel {
         }
 
         return code;
+    }
+
+    public void setCodeLength(int length) {
+        this.CODE_LENGTH = length;
     }
 
     public boolean isValidGuess(List<ShapeType> guess) {

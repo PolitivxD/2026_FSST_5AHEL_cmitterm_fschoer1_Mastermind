@@ -29,7 +29,6 @@ public class MastermindController {
         view.setOnClearCurrentGuess(event -> clearCurrentGuess());
         view.setOnRemoveLast(event -> removeLastShape());
         view.setOnShowDescription(event -> view.showDescriptionDialog());
-
         startNewGame();
         loadScoreboard();
     }
@@ -41,9 +40,11 @@ public class MastermindController {
         view.resetBoard();
         view.renderCurrentGuess(currentGuess);
         view.updateRemainingAttempts(model.getRemainingAttempts());
-        view.showInfo("Neues Spiel gestartet. Wähle 4 Formen aus oder ziehe sie direkt in den Prüfbereich.");
+        view.showInfo("Neues Spiel gestartet. Wähle 4-6 Formen aus oder ziehe sie direkt in den Prüfbereich.");
         view.enableInput(true);
     }
+
+
 
     private void resetCurrentGuess() {
         currentGuess.clear();
@@ -124,6 +125,7 @@ public class MastermindController {
             return;
         }
 
+
         model.makeGuess(currentGuess);
 
         view.updateBoard(model.getHistory());
@@ -148,6 +150,8 @@ public class MastermindController {
         }
 
         view.showInfo("Versuch gespeichert. Verbleibende Versuche: " + model.getRemainingAttempts());
+
+
     }
 
     private String formatSecretCode(List<ShapeType> secretCode) {
