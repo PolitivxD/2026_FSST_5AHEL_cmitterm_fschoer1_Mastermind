@@ -9,6 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -57,6 +60,8 @@ public class MastermindView extends BorderPane {
 
     private final GridPane boardGrid = new GridPane();
 
+    private final TableView<ScoreEntry> scoreboardTable = new TableView<>();
+
     private final List<HBox> guessRows = new ArrayList<>();
     private final List<HBox> feedbackRows = new ArrayList<>();
 
@@ -100,7 +105,40 @@ public class MastermindView extends BorderPane {
 
         setTop(topBox);
         setCenter(boardGrid);
+        setRight(createScoreboardBox());
         setBottom(bottomBox);
+    }
+
+    private VBox createScoreboardBox() {
+        Label scoreboardLabel = new Label("Scoreboard");
+        scoreboardLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        TableColumn<ScoreEntry, Integer> rankColumn = new TableColumn<>("Platz");
+        rankColumn.setCellValueFactory(new PropertyValueFactory<>("rank"));
+
+        TableColumn<ScoreEntry, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<ScoreEntry, Integer> attemptsColumn = new TableColumn<>("Versuche");
+        attemptsColumn.setCellValueFactory(new PropertyValueFactory<>("attempts"));
+
+        scoreboardTable.getColumns().clear();
+        scoreboardTable.getColumns().add(rankColumn);
+        scoreboardTable.getColumns().add(nameColumn);
+        scoreboardTable.getColumns().add(attemptsColumn);
+
+        scoreboardTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        scoreboardTable.setPrefWidth(300);
+        scoreboardTable.setPrefHeight(420);
+
+        VBox scoreboardBox = new VBox(10, scoreboardLabel, scoreboardTable);
+        scoreboardBox.setPadding(new Insets(0, 0, 0, 20));
+
+        return scoreboardBox;
+    }
+
+    public void updateScoreboard(List<ScoreEntry> scores) {
+        scoreboardTable.getItems().setAll(scores);
     }
 
     public void showDescriptionDialog() {
@@ -582,5 +620,29 @@ public class MastermindView extends BorderPane {
 
     public void setOnShowDescription(EventHandler<ActionEvent> handler) {
         descriptionButton.setOnAction(handler);
+    }
+
+    public static class ScoreEntry {
+        private final int rank;
+        private final String name;
+        private final int attempts;
+
+        public ScoreEntry(int rank, String name, int attempts) {
+            this.rank = rank;
+            this.name = name;
+            this.attempts = attempts;
+        }
+
+        public int getRank() {
+            return rank;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAttempts() {
+            return attempts;
+        }
     }
 }

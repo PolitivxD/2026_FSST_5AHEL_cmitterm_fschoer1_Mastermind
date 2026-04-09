@@ -12,12 +12,14 @@ public class MastermindController {
 
     private final MastermindModel model;
     private final MastermindView view;
+    private final Leaderboard leaderboard;
 
     private final List<ShapeType> currentGuess = new ArrayList<>();
 
     public MastermindController(MastermindModel model, MastermindView view) {
         this.model = model;
         this.view = view;
+        this.leaderboard = new Leaderboard();
 
         view.setOnShapeSelected(this::handleShapeSelected);
         view.setOnShapeDroppedToGuess(this::handleShapeDroppedToGuess);
@@ -29,6 +31,7 @@ public class MastermindController {
         view.setOnShowDescription(event -> view.showDescriptionDialog());
 
         startNewGame();
+        loadScoreboard();
     }
 
     private void startNewGame() {
@@ -48,7 +51,6 @@ public class MastermindController {
         for (int i = 0; i < MastermindModel.CODE_LENGTH; i++) {
             currentGuess.add(null);
         }
-
     }
 
     private void handleShapeSelected(ShapeType shapeType) {
@@ -60,13 +62,12 @@ public class MastermindController {
             }
         }
 
-        view.showError("Es sind bereits 4 Formen ausgewählt. Prüfen sie die Eingabe oder leere sie zuerst.");
+        view.showError("Es sind bereits 4 Formen ausgewählt. Prüfe die Eingabe oder leere sie zuerst.");
     }
 
     private void handleShapeDroppedToGuess(ShapeType shapeType, int targetIndex) {
         if (targetIndex < 0 || targetIndex >= currentGuess.size()) {
             return;
-
         }
 
         currentGuess.set(targetIndex, shapeType);
@@ -134,14 +135,15 @@ public class MastermindController {
         if (model.isWon()) {
             view.showWinMessage("Gewonnen! Du hast den geheimen Code richtig erraten.");
             view.enableInput(false);
-            Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
+
+            new Leaderboard(model.getAttemptsUsed());
+            loadScoreboard();
             return;
         }
 
         if (model.isGameOver()) {
             view.showLoseMessage("Keine Versuche mehr. Geheimer Code: " + formatSecretCode(model.getSecretCode()));
             view.enableInput(false);
-            //Leaderboard leaderboard = new Leaderboard(model.getAttemptsUsed());
             return;
         }
 
@@ -160,5 +162,10 @@ public class MastermindController {
         }
 
         return builder.toString();
+    }
+
+    private void loadScoreboard() {
+        List<MastermindView.ScoreEntry> scores = leaderboard.getScoresfromfile();
+        view.updateScoreboard(scores);
     }
 }

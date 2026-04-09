@@ -1,13 +1,21 @@
 package org.example.mastermind.model;
 
 import javafx.scene.control.TextInputDialog;
+import org.example.mastermind.view.MastermindView;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.io.File;                  // Import the File class
+import java.io.FileNotFoundException; // Import this class to handle errors
+import java.util.Scanner;
 
 public class Leaderboard {
+    public Leaderboard() {
+    }
 
     public Leaderboard (int attemptsUsed)  {
         String name = getUsername();
@@ -68,7 +76,37 @@ public class Leaderboard {
 
 
     }
+    public List<MastermindView.ScoreEntry> getScoresfromfile() {
 
+        List<MastermindView.ScoreEntry> scores = new ArrayList<>();
 
+        String name;
+        int attemptsUsed;
+        int rank = 1;
+
+        File myObj = new File("Scores.txt");
+
+        try (Scanner myReader = new Scanner(myObj)) {
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+
+                String[] teile = data.split(",");
+
+                String[] spielerTeil = teile[0].split(":");
+                String[] versucheTeil = teile[1].split(":");
+
+                name = spielerTeil[1];
+                attemptsUsed = Integer.parseInt(versucheTeil[1]);
+
+                scores.add(new MastermindView.ScoreEntry(0, name, attemptsUsed));
+                rank++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+        return scores;
+    }
 }
 

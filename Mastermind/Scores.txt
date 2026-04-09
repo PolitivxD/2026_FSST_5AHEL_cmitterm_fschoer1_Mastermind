@@ -1,1 +1,2 @@
 Spieler:Politiv,Versuche:10
+Spieler:Politiv,Versuche:8
