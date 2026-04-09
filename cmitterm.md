@@ -1629,7 +1629,72 @@ public class MastermindView extends BorderPane {
 * **Drag & Drop direkt aus der Auswahl in den Prüfbereich**
 * **Drag-Vorschau folgt sichtbar der Maus**
 * **Drag & Drop im Prüfbereich untereinander** bleibt erhalten
+
+
+
 * die **grauen Umrandungen** im Spielfeld sind jetzt **transparent**
 
 Wenn beim Einfügen etwas rot wird, schick mir nur den **ersten Fehler**, dann korrigiere ich ihn direkt.
 
+
+------
+
+--------
+
+
+## Promt: ##
+Apr. 09, 2026 11:10:41 AM javafx.scene.control.cell.PropertyValueFactory getCellDataReflectively WARNUNG: Can not retrieve property 'attempts' in PropertyValueFactory: javafx.scene.control.cell.PropertyValueFactory@227d6854 with provided class type: class org.example.mastermind.view.MastermindView$ScoreEntry java.lang.RuntimeException: java.lang.IllegalAccessException: module javafx.base cannot access class org.example.mastermind.view.MastermindView$ScoreEntry (in module org.example.mastermind) because module org.example.mastermind does not open org.example.mastermind.view to javafx.base at javafx.base@21/com.sun.javafx.property.PropertyReference.get(PropertyReference.java:173) at javafx.controls@21/javafx.scene.control.cell.PropertyValueFactory.getCellDataReflectively(PropertyValueFactory.java:183) at javafx.controls@21/javafx.scene.control.cell.PropertyValueFactory.call(PropertyValueFactory.java:153) at javafx.controls@21/javafx.scene.control.cell.PropertyValueFactory.call(PropertyValueFactory.java:132) at javafx.controls@21/javafx.scene.control.TableColumn.getCellObservableValue(TableColumn.java:592) at javafx.controls@21/javafx.scene.control.TableColumn.getCellObservableValue(TableColumn.java:577) at javafx.controls@21/javafx.scene.control.TableCell.updateItem(TableCell.java:681) at javafx.controls@21/javafx.scene.control.TableCell.indexChanged(TableCell.java:485) at javafx.controls@21/javafx.scene.control.IndexedCell$1.invalidated(IndexedCell.java:85) at javafx.base@21/javafx.beans.property.IntegerPropertyBase.markInvalid(IntegerPropertyBase.java:113) at javafx.base@21/javafx.beans.property.IntegerPropertyBase.set(IntegerPropertyBase.java:148) at javafx.controls@21/javafx.scene.control.IndexedCell.updateIndex(IndexedCell.java:130) at javafx.controls@21/javafx.scene.control.skin.TableRowSkinBase.updateCells(TableRowSkinBase.java:525) at javafx.controls@21/javafx.scene.control.skin.TableRowSkinBase.<init>(TableRowSkinBase.java:155) at javafx.controls@21/javafx.scene.control.skin.TableRowSkin.<init>(TableRowSkin.java:81) at javafx.controls@21/javafx.scene.control.TableRow.createDefaultSkin(TableRow.java:213) at javafx.controls@21/javafx.scene.control.Control.doProcessCSS(Control.java:910) at javafx.controls@21/javafx.scene.control.Control$1.doProcessCSS(Control.java:88) at javafx.controls@21/com.sun.javafx.scene.control.ControlHelper.processCSSImpl(ControlHelper.java:68) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Parent.doProcessCSS(Parent.java:1401) at javafx.graphics@21/javafx.scene.Parent$1.doProcessCSS(Parent.java:125) at javafx.graphics@21/com.sun.javafx.scene.ParentHelper.processCSSImpl(ParentHelper.java:98) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Parent.doProcessCSS(Parent.java:1401) at javafx.graphics@21/javafx.scene.Parent$1.doProcessCSS(Parent.java:125) at javafx.graphics@21/com.sun.javafx.scene.ParentHelper.processCSSImpl(ParentHelper.java:98) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Node.processCSS(Node.java:9555) at javafx.graphics@21/javafx.scene.Node.applyCss(Node.java:9642) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.setCellIndex(VirtualFlow.java:1819) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.getCell(VirtualFlow.java:1796) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.getOrCreateCellSize(VirtualFlow.java:3068) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.getOrCreateCellSize(VirtualFlow.java:3040) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.recalculateAndImproveEstimatedSize(VirtualFlow.java:3144) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow$5.invalidated(VirtualFlow.java:865) at javafx.base@21/javafx.beans.property.IntegerPropertyBase.markInvalid(IntegerPropertyBase.java:113) at javafx.base@21/javafx.beans.property.IntegerPropertyBase.set(IntegerPropertyBase.java:148) at javafx.controls@21/javafx.scene.control.skin.VirtualFlow.setCellCount(VirtualFlow.java:911) at javafx.controls@21/javafx.scene.control.skin.TableViewSkinBase.updateItemCount(TableViewSkinBase.java:580) at javafx.controls@21/javafx.scene.control.skin.TableViewSkin.<init>(TableViewSkin.java:123) at javafx.controls@21/javafx.scene.control.TableView.createDefaultSkin(TableView.java:1671) at javafx.controls@21/javafx.scene.control.Control.doProcessCSS(Control.java:910) at javafx.controls@21/javafx.scene.control.Control$1.doProcessCSS(Control.java:88) at javafx.controls@21/com.sun.javafx.scene.control.ControlHelper.processCSSImpl(ControlHelper.java:68) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Parent.doProcessCSS(Parent.java:1401) at javafx.graphics@21/javafx.scene.Parent$1.doProcessCSS(Parent.java:125) at javafx.graphics@21/com.sun.javafx.scene.ParentHelper.processCSSImpl(ParentHelper.java:98) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Parent.doProcessCSS(Parent.java:1401) at javafx.graphics@21/javafx.scene.Parent$1.doProcessCSS(Parent.java:125) at javafx.graphics@21/com.sun.javafx.scene.ParentHelper.processCSSImpl(ParentHelper.java:98) at javafx.graphics@21/com.sun.javafx.scene.NodeHelper.processCSS(NodeHelper.java:147) at javafx.graphics@21/javafx.scene.Node.processCSS(Node.java:9555) at javafx.graphics@21/javafx.scene.Scene.doCSSPass(Scene.java:587) at javafx.graphics@21/javafx.scene.Scene.preferredSize(Scene.java:1786) at javafx.graphics@21/javafx.scene.Scene$2.preferredSize(Scene.java:411) at javafx.graphics@21/com.sun.javafx.scene.SceneHelper.preferredSize(SceneHelper.java:65) at javafx.graphics@21/javafx.stage.Window$12.invalidated(Window.java:1163) at javafx.base@21/javafx.beans.property.BooleanPropertyBase.markInvalid(BooleanPropertyBase.java:110) at javafx.base@21/javafx.beans.property.BooleanPropertyBase.set(BooleanPropertyBase.java:145) at javafx.graphics@21/javafx.stage.Window.setShowing(Window.java:1239) at javafx.graphics@21/javafx.stage.Window.show(Window.java:1254) at javafx.graphics@21/javafx.stage.Stage.show(Stage.java:277) at org.example.mastermind/org.example.mastermind.MainApp.start(MainApp.java:22) at javafx.graphics@21/com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$9(LauncherImpl.java:839) at javafx.graphics@21/com.sun.javafx.application.PlatformImpl.lambda$runAndWait$12(PlatformImpl.java:483) at javafx.graphics@21/com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:456) at java.base/java.security.AccessController.doPrivileged(AccessController.java:400) at javafx.graphics@21/com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:455) at javafx.graphics@21/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95) at javafx.graphics@21/com.sun.glass.ui.win.WinApplication._runLoop(Native Method) at javafx.graphics@21/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185) at java.base/java.lang.Thread.run(Thread.java:1583) Caused by: java.lang.IllegalAccessException: module javafx.base cannot access class org.example.mastermind.view.MastermindView$ScoreEntry (in module org.example.mastermind) because module org.example.mastermind does not open org.example.mastermind.view to javafx.base at javafx.base@21/com.sun.javafx.property.MethodHelper.invoke(MethodHelper.java:70) at javafx.base@21/com.sun.javafx.property.PropertyReference.get(PropertyReference.java:171) ... 74 more Process finished with exit code 130 tebelle ist da aber leer
+
+
+## Ausgabe: ##
+
+Die Tabelle ist **nicht leer wegen `Scores.txt`**, sondern wegen **`PropertyValueFactory` + Java-Modulsystem**.
+`PropertyValueFactory` liest die Werte **per Reflection** aus deinem Zeilenobjekt. In einem **named module** muss das Paket dafür für `javafx.base` geöffnet sein, sonst gibt JavaFX genau solche Warnungen aus und liefert `null` an die Tabelle zurück. Die OpenJFX-Doku sagt ausdrücklich: Wenn die Klasse in einem Modul liegt, muss das Paket für `javafx.base` geöffnet sein, sonst loggt `PropertyValueFactory` eine Warnung und gibt `null` zurück. ([download.java.net][1])
+
+## Schnellste Reparatur
+
+Dein `module-info.java` muss so erweitert werden:
+
+```java
+module org.example.mastermind {
+    requires javafx.controls;
+
+    exports org.example.mastermind;
+    opens org.example.mastermind.view to javafx.base;
+}
+```
+
+`opens ... to javafx.base` ist hier genau für den reflektiven Zugriff von `PropertyValueFactory` nötig. ([download.java.net][1])
+
+## Warum genau dieses Paket?
+
+Dein `ScoreEntry` liegt als innere Klasse in:
+
+```java
+org.example.mastermind.view.MastermindView$ScoreEntry
+```
+
+Also muss **`org.example.mastermind.view`** geöffnet werden. Das zeigt auch deine Fehlermeldung direkt:
+
+```text
+module org.example.mastermind does not open org.example.mastermind.view to javafx.base
+```
+
+Das ist die eigentliche Ursache, warum `rank`, `name` und `attempts` nicht gelesen werden. ([download.java.net][1])
+
+## Danach
+
+1. `module-info.java` speichern
+2. Projekt neu bauen
+3. neu starten
+
+Dann sollte deine Tabelle die Einträge aus `Scores.txt` anzeigen, **sofern `getScoresfromfile()` wirklich Daten zurückgibt**.
+
+## Noch sauberer als Alternative
+
+Statt `PropertyValueFactory` kannst du auch **keine Reflection** verwenden und die Spalten mit Lambdas befüllen. Das umgeht das Modulproblem komplett. OpenJFX dokumentiert, dass `PropertyValueFactory` reflektiv arbeitet; genau deshalb entsteht dein Problem. ([openjfx.io][2])
+
+Wenn du willst, gebe ich dir direkt die Version **ohne `PropertyValueFactory`**, damit du `module-info.java` nicht öffnen musst.
+
+[1]: https://download.java.net/java/GA/javafx20.0.1/docs/api/javafx.controls/javafx/scene/control/cell/PropertyValueFactory.html?utm_source=chatgpt.com "PropertyValueFactory (JavaFX 20)"
+[2]: https://openjfx.io/javadoc/12/javafx.controls/javafx/scene/control/cell/PropertyValueFactory.html?utm_source=chatgpt.com "Class PropertyValueFactory<S,​T>"
